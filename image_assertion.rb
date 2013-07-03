@@ -1,26 +1,45 @@
 require 'open3'
 require 'shellwords'
+require 'FileUtils'
 
 class ImageAssertion
 
   MAX_ALLOWED_DIFF_VALUE  = 1.0
   DIFF_IMAGE_FOLDER_NAME  = 'screens_diff'
+  TEMP_IMAGE_FOLDER_NAME  = 'screens_temp'
 
   def self.assert_image(test_output, ref_images_path, image_name)
 
     return false unless (test_output && ref_images_path && image_name)
 
     diff_images_path  = File.join(test_output, DIFF_IMAGE_FOLDER_NAME)
+    ref_masks_path = File.join(ref_images_path, 'masks')
     Dir.mkdir(diff_images_path) unless File.directory?(diff_images_path)
 
     image_file_name   = image_name + '.png'
-    expected_path     = File.join(ref_images_path, image_file_name)
+    ref_image_path     = File.join(ref_images_path, image_file_name)
+    mask_path         = File.join(ref_masks_path, image_name + '_mask.png')
+    temp_images_path  = File.join(test_output, TEMP_IMAGE_FOLDER_NAME)
     diff_path         = File.join(diff_images_path, image_file_name)
 
+    Dir.mkdir(temp_images_path) unless File.directory?(temp_images_path)
+
     run_folder_name   = find_last_folder(test_output)
-    received_path     = File.join(run_folder_name, image_file_name)
+
+    FileUtils.cp(File.join(run_folder_name, image_file_name), temp_images_path);
+    received_instrument_path     = File.join(temp_images_path, image_file_name)
 
     print_status(create_status('started', "Asserting #{image_file_name}."))
+
+    if (File.exists?(mask_path))
+      received_path = File.join(temp_images_path, image_name + '_masked.png')
+      mask(mask_path, received_instrument_path, received_path)
+      expected_path = File.join(temp_images_path, image_name + '_ref_masked.png')
+      mask(mask_path, ref_image_path, expected_path)
+    else
+      expected_path = ref_image_path  
+      received_path = received_instrument_path
+    end
 
     if !File.exists?(received_path) || !File.exists?(expected_path)
 
@@ -29,13 +48,17 @@ class ImageAssertion
       return false
 
     else
-
+      
       result = im_compare(expected_path, received_path, diff_path)
       return process_imagemagick_result(image_file_name, result)
     end
   end
 
 private
+
+  def self.mask(mask_path, received_path, result_path)
+    `convert -page +0+0 \"#{received_path}\" -page +0+0 \"#{mask_path}\" -flatten \"#{result_path}\"`
+  end
 
   # Iterte through folders with name Run* and return with latests run number
   def self.find_last_folder(test_output)
