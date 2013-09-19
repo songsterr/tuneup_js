@@ -66,12 +66,12 @@ opts_parser = OptionParser.new do |opts|
   end
 end
 
-unless ARGV.length >= 3
+unless ARGV.length >= 4
   STDERR.puts opts_parser.help
   exit 1
 end
 
-app_bundle, test_script, test_output = ARGV.shift 3
+app_bundle, test_script, test_output, template_file = ARGV.shift 4
 
 begin
   opts_parser.parse!
@@ -179,11 +179,16 @@ end
 SDKROOT = `/usr/bin/xcodebuild -version -sdk iphoneos | grep PlatformPath`.split(":")[1].chomp.sub(/^\s+/, "")
 XCODE_ROOT = `/usr/bin/xcode-select -print-path`.chomp.sub(/^\s+/, "")
 
-TEMPLATE = `[ -f /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Instruments/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ] && echo "#{SDKROOT}/Developer/Library/Instruments/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate" || echo "#{XCODE_ROOT}/../Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate"`.chomp.sub(/^\s+/, "")
+template = ""
+if template_file.length == 0
+  template = `[ -f /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Instruments/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate ] && echo "#{SDKROOT}/Developer/Library/Instruments/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate" || echo "#{XCODE_ROOT}/../Applications/Instruments.app/Contents/PlugIns/AutomationInstrument.bundle/Contents/Resources/Automation.tracetemplate"`.chomp.sub(/^\s+/, "")
+else
+  template = File.expand_path(template_file)
+end
 
 command = ["/usr/bin/instruments"]
 command << "-w" << options.device if options.device
-command << "-t" << "#{TEMPLATE}"
+command << "-t" << "#{template}"
 command << app_bundle
 command << "-e" << "UIASCRIPT" << test_script
 command << "-e" << "UIARESULTSPATH" << test_output
