@@ -344,7 +344,7 @@ extend(UIATarget.prototype, {
   	isDeviceiPhone5: function() {
   		var isIphone = this.isDeviceiPhone();
   		var deviceScreen = this.rect();
-      	return isIphone && deviceScreen.size.height == 568;
+      	return isIphone && (deviceScreen.size.height == 568 || deviceScreen.size.width == 568);
      },
 
     /**
