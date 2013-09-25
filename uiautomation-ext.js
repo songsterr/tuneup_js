@@ -353,8 +353,11 @@ extend(UIATarget.prototype, {
     captureAppScreenWithName: function(imageName) {
       var appRect = this.rect();
 
-      appRect.origin.y     += 20.0;
-      appRect.size.height  -= 20.0;
+      var isStatusBarVisible = this.frontMostApp().statusBar().isVisible();
+      if (isStatusBarVisible) {
+         appRect.origin.y     += 20.0;
+         appRect.size.height  -= 20.0;
+      };
 
       return this.captureRectWithName(appRect, imageName);
     },
