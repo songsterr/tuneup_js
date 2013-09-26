@@ -81,8 +81,10 @@ private
 
     #imagemagick outputs floating point metrics value when succeeds
     compare_succeed = ( stderr.match(/[0-9]*\.?[0-9]+/).length > 0 )
-    threshold ||= MAX_ALLOWED_DIFF_VALUE
-
+    if threshold == 0
+      threshold = MAX_ALLOWED_DIFF_VALUE
+    end
+    
     if compare_succeed
       if stderr.to_f < threshold
 
