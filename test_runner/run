@@ -156,7 +156,7 @@ raise "App bundle '#{app_bundle}' doesn't exist" unless File.directory?(app_bund
 
 
 if options.preprocess or options.run
-  temp_file = Tempfile.new(File.basename(test_script))
+  temp_file = Tempfile.new(File.basename(test_script), test_output)
 
   # inject test filter
   if options.run
