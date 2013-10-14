@@ -192,6 +192,7 @@ command << "-t" << "#{template}"
 command << app_bundle
 command << "-e" << "UIASCRIPT" << test_script
 command << "-e" << "UIARESULTSPATH" << test_output
+command << "-e" << "UI_TESTS" << "yes"
 options.env_vars.to_a.each do |pair|
   command << "-e"
   command.concat(pair)
