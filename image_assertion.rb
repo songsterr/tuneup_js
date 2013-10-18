@@ -6,6 +6,7 @@ class ImageAssertion
 
   MAX_ALLOWED_DIFF_VALUE  = 1.0
   DIFF_IMAGE_FOLDER_NAME  = 'screens_diff'
+  DIFF_FAILED_IMAGE_FOLDER_NAME  = 'screens_diff_failed'
   TEMP_IMAGE_FOLDER_NAME  = 'screens_temp'
 
   def self.assert_image(test_output, ref_images_path, image_name, threshold)
@@ -13,11 +14,13 @@ class ImageAssertion
     return false unless (test_output && ref_images_path && image_name)
 
     diff_images_path  = File.join(test_output, DIFF_IMAGE_FOLDER_NAME)
+    diff_failed_images_path  = File.join(test_output, DIFF_FAILED_IMAGE_FOLDER_NAME)
     ref_masks_path = File.join(ref_images_path, 'masks')
     Dir.mkdir(diff_images_path) unless File.directory?(diff_images_path)
+    Dir.mkdir(diff_failed_images_path) unless File.directory?(diff_failed_images_path)
 
     image_file_name   = image_name + '.png'
-    ref_image_path     = File.join(ref_images_path, image_file_name)
+    ref_image_path    = File.join(ref_images_path, image_file_name)
     mask_path         = File.join(ref_masks_path, image_name + '_mask.png')
     temp_images_path  = File.join(test_output, TEMP_IMAGE_FOLDER_NAME)
     diff_path         = File.join(diff_images_path, image_file_name)
@@ -50,7 +53,7 @@ class ImageAssertion
     else
       
       result = im_compare(expected_path, received_path, diff_path)
-      return process_imagemagick_result(image_file_name, result, threshold)
+      return process_imagemagick_result(image_file_name, result, threshold, test_output)
     end
   end
 
@@ -73,7 +76,7 @@ private
     end[0]
   end
 
-  def self.process_imagemagick_result(image_file_name, stderr, threshold)
+  def self.process_imagemagick_result(image_file_name, stderr, threshold, test_output)
 
     result_status   = 'failed'
     result_message  = "#{image_file_name} is not equal to the reference."
@@ -92,6 +95,11 @@ private
         result_message  = "#{image_file_name} asserted successfully."
         assertionResult = true
       else
+        diff_images_path  = File.join(test_output, DIFF_IMAGE_FOLDER_NAME)
+        diff_failed_images_path  = File.join(test_output, DIFF_FAILED_IMAGE_FOLDER_NAME)
+        diff_path = File.join(diff_images_path, image_file_name)
+        FileUtils.cp(diff_path, diff_failed_images_path)
+
         print_status(create_status(result_status, "expected diff is smaller than #{threshold} but #{stderr.to_f}."))
       end
     else
