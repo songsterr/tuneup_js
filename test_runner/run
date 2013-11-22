@@ -186,13 +186,16 @@ else
   template = File.expand_path(template_file)
 end
 
+is_ui_debug_tests = options.run ? "true" : "false"
+
 command = ["/usr/bin/instruments"]
 command << "-w" << options.device if options.device
 command << "-t" << "#{template}"
 command << app_bundle
 command << "-e" << "UIASCRIPT" << test_script
 command << "-e" << "UIARESULTSPATH" << test_output
-command << "-e" << "UI_TESTS" << "yes"
+command << "-e" << "UI_TESTS" << "true"
+command << "-e" << "UI_DEBUG_TESTS" << is_ui_debug_tests
 options.env_vars.to_a.each do |pair|
   command << "-e"
   command.concat(pair)
