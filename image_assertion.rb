@@ -123,7 +123,7 @@ private
 
   def self.im_compare(expected_path, received_path, diff_path)
 
-    command = '/usr/local/bin/compare -metric MAE '
+    command = 'compare -metric MAE '
     command << Shellwords.escape(expected_path) + ' '
     command << Shellwords.escape(received_path) + ' '
     command << ( diff_path ? Shellwords.escape(diff_path) : 'null:' )
