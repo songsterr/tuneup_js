@@ -29,7 +29,7 @@ class ImageAssertion
 
     run_folder_name   = find_last_folder(test_output)
 
-    FileUtils.cp(File.join(run_folder_name, image_file_name), temp_images_path);
+    FileUtils.cp_r(File.join(run_folder_name, image_file_name), temp_images_path, :remove_destination => true);
     received_instrument_path     = File.join(temp_images_path, image_file_name)
 
     print_status(create_status('started', "Asserting #{image_file_name}."))

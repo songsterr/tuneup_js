@@ -58,6 +58,17 @@ function assertScreenMatchesImageNamed(imageName, message, threshold) {
     throw new AssertionException("imageAsserter isn't created.");
   }
 
+  var command,
+      taskResult,
+      assertSuccessfull = false,
+      SUCCESS_EXIT_CODE = 0,
+      TIMEOUT           = 5,
+      args              = [this.imageAsserter.outputPath + "/Run 1/" + imageName + ".png"];
+
+  log(args);
+  command     = '/bin/rm';
+  taskResult  = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout(command, args, TIMEOUT);
+  
   UIATarget.localTarget().captureAppScreenWithName(imageName);
   UIATarget.localTarget().delay(1); // delay for screenshot to be saved
 
