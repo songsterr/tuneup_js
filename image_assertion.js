@@ -65,7 +65,6 @@ function assertScreenMatchesImageNamed(imageName, message, threshold) {
       TIMEOUT           = 5,
       args              = [this.imageAsserter.outputPath + "/Run 1/" + imageName + ".png"];
 
-  log(args);
   command     = '/bin/rm';
   taskResult  = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout(command, args, TIMEOUT);
   
