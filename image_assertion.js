@@ -69,7 +69,7 @@ function assertScreenMatchesImageNamed(imageName, message, threshold) {
   taskResult  = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout(command, args, TIMEOUT);
   
   UIATarget.localTarget().captureAppScreenWithName(imageName);
-  UIATarget.localTarget().delay(1); // delay for screenshot to be saved
+  UIATarget.localTarget().delay(1.5); // delay for screenshot to be saved
 
   var assertionPassed = this.imageAsserter.assertImageNamed(imageName, threshold);
   if (!assertionPassed) {
