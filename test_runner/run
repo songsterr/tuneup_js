@@ -71,7 +71,7 @@ unless ARGV.length >= 4
   exit 1
 end
 
-app_bundle, test_script, test_output, template_file = ARGV.shift 4
+app_bundle, test_script, test_output, template_file, simulatorDevice = ARGV.shift 5
 
 begin
   opts_parser.parse!
@@ -190,6 +190,7 @@ is_ui_debug_tests = options.run ? "true" : "false"
 
 command = ["/usr/bin/instruments"]
 command << "-w" << options.device if options.device
+command << "-w" << simulatorDevice
 command << "-t" << "#{template}"
 command << app_bundle
 command << "-e" << "UIASCRIPT" << test_script
